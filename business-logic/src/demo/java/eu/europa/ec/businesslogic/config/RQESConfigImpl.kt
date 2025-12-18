@@ -53,7 +53,8 @@ class RQESConfigImpl(val context: Context) : EudiRQESUiConfig {
                 R.raw.pidissuerca02_lu,
                 R.raw.pidissuerca02_nl,
                 R.raw.pidissuerca02_pt,
-                R.raw.pidissuerca02_ut
+                R.raw.pidissuerca02_ut,
+                R.raw.verifier_fresh,
             )
         )
 }

@@ -44,7 +44,17 @@ internal class WalletCoreConfigImpl(
                         withClientIdSchemes(
                             listOf(
                                 ClientIdScheme.X509SanDns,
-                                ClientIdScheme.X509Hash
+                                ClientIdScheme.X509Hash,
+                                ClientIdScheme.RedirectUri,
+                                ClientIdScheme.Preregistered(
+                                    listOf(
+                                        PreregisteredVerifier(
+                                            clientId = "59023802b7d7.ngrok-free.app", // Your Client ID (Domain)
+                                            legalName = "Ascertia Local",
+                                            verifierApi = "https://59023802b7d7.ngrok-free.app" // Your Full URL
+                                        )
+                                    )
+                                )
                             )
                         )
                         withSchemes(
@@ -69,6 +79,7 @@ internal class WalletCoreConfigImpl(
                         R.raw.pidissuerca02_nl,
                         R.raw.pidissuerca02_pt,
                         R.raw.pidissuerca02_ut,
+                        R.raw.verifier_fresh,
                         R.raw.dc4eu,
                         R.raw.r45_staging
                     )
