@@ -16,11 +16,16 @@
 
 package eu.europa.ec.networklogic.di
 
+import eu.europa.ec.businesslogic.config.AppBuildType
+import eu.europa.ec.businesslogic.config.ConfigLogic
 import eu.europa.ec.networklogic.repository.WalletAttestationRepository
 import eu.europa.ec.networklogic.repository.WalletAttestationRepositoryImpl
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
@@ -28,13 +33,6 @@ import kotlinx.serialization.json.Json
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
-import android.annotation.SuppressLint
-import java.security.SecureRandom
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
-import javax.security.cert.CertificateException
 
 @Module
 @ComponentScan("eu.europa.ec.networklogic")
@@ -47,50 +45,26 @@ fun provideJson(): Json = Json {
     isLenient = true
 }
 
-@SuppressLint("TrustAllX509TrustManager", "CustomX509TrustManager")
-    @Single
-    fun provideHttpClient(json: Json): HttpClient {
-        val trustAllCerts = arrayOf<TrustManager>(
-            object : X509TrustManager {
-                @Throws(CertificateException::class)
-                override fun checkClientTrusted(
-                    chain: Array<java.security.cert.X509Certificate>,
-                    authType: String
-                ) {
-                }
-    
-                @Throws(CertificateException::class)
-                override fun checkServerTrusted(
-                    chain: Array<java.security.cert.X509Certificate>,
-                    authType: String
-                ) {
-                }
-    
-                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
-                    return arrayOf()
-                }
-            }
-        )
-    
-        return HttpClient(Android) {
-            install(Logging)
-            install(ContentNegotiation) {
-                json(
-                    json = json,
-                    contentType = ContentType.Application.Json
-                )
-            }
-            engine {
-                requestConfig
-                sslManager = { httpsURLConnection ->
-                    httpsURLConnection.sslSocketFactory = SSLContext.getInstance("TLS").apply {
-                        init(null, trustAllCerts, SecureRandom())
-                    }.socketFactory
-                    httpsURLConnection.hostnameVerifier = HostnameVerifier { _, _ -> true }
-                }
+@Single
+fun provideHttpClient(json: Json, configLogic: ConfigLogic): HttpClient {
+    return HttpClient(Android) {
+
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = when (configLogic.appBuildType) {
+                AppBuildType.DEBUG -> LogLevel.BODY
+                AppBuildType.RELEASE -> LogLevel.NONE
             }
         }
+
+        install(ContentNegotiation) {
+            json(
+                json = json,
+                contentType = ContentType.Application.Json
+            )
+        }
     }
+}
 
 @Single
 fun provideWalletAttestationRepository(httpClient: HttpClient): WalletAttestationRepository =
