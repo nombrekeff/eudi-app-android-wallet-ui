@@ -53,6 +53,16 @@ internal class WalletCoreConfigImpl(
                                             clientId = "59023802b7d7.ngrok-free.app", // Your Client ID (Domain)
                                             legalName = "Ascertia Local",
                                             verifierApi = "https://59023802b7d7.ngrok-free.app" // Your Full URL
+                                        ),
+                                        PreregisteredVerifier(
+                                            clientId = "dot.staging.ascertia.ngrok.dev", // Your Client ID (Domain)
+                                            legalName = "Ascertia Local",
+                                            verifierApi = "https://dot.staging.ascertia.ngrok.dev" // Your Full URL
+                                        ),
+                                        PreregisteredVerifier(
+                                            clientId = "dot.demo.ascertia.ngrok.dev", // Your Client ID (Domain)
+                                            legalName = "Ascertia Local",
+                                            verifierApi = "https://dot.demo.ascertia.ngrok.dev" // Your Full URL
                                         )
                                     )
                                 )
